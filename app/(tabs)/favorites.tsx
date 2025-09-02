@@ -6,64 +6,35 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     Dimensions,
     FlatList,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-export default function RecipesScreen() {
-  const { recipes, loading, toggleFavorite, deleteRecipe, searchRecipes } = useDatabaseContext();
+export default function FavoritesScreen() {
+  const { favoriteRecipes, loading, toggleFavorite } = useDatabaseContext();
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
-  const categories = ['All', 'Breakfast', 'Dinner', 'Dessert', 'Lunch'];
+  const [filteredFavorites, setFilteredFavorites] = useState<Recipe[]>([]);
 
   useEffect(() => {
     if (searchQuery.trim()) {
-      handleSearch();
+      const filtered = favoriteRecipes.filter(recipe =>
+        recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredFavorites(filtered);
     } else {
-      filterByCategory();
+      setFilteredFavorites(favoriteRecipes);
     }
-  }, [searchQuery, selectedCategory, recipes]);
-
-  const handleSearch = async () => {
-    if (searchQuery.trim()) {
-      const results = await searchRecipes(searchQuery);
-      setFilteredRecipes(results);
-    } else {
-      filterByCategory();
-    }
-  };
-
-  const filterByCategory = () => {
-    if (selectedCategory === 'All') {
-      setFilteredRecipes(recipes);
-    } else {
-      setFilteredRecipes(recipes.filter(recipe => recipe.category === selectedCategory));
-    }
-  };
+  }, [searchQuery, favoriteRecipes]);
 
   const handleToggleFavorite = async (id: number) => {
     await toggleFavorite(id);
-  };
-
-  const handleDeleteRecipe = (id: number) => {
-    Alert.alert(
-      'Delete Recipe',
-      'Are you sure you want to delete this recipe?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => deleteRecipe(id) },
-      ]
-    );
   };
 
   const getRecipeImage = (category: string) => {
@@ -76,9 +47,9 @@ export default function RecipesScreen() {
     return (images as any)[category] || '🍽️';
   };
 
-  const renderRecipeCard = ({ item }: { item: Recipe }) => (
+  const renderFavoriteCard = ({ item }: { item: Recipe }) => (
     <TouchableOpacity
-      style={styles.recipeCard}
+      style={styles.favoriteCard}
       onPress={() => router.push(`/recipe/${item.id}`)}
     >
       <LinearGradient
@@ -93,9 +64,9 @@ export default function RecipesScreen() {
           onPress={() => handleToggleFavorite(item.id!)}
         >
           <Ionicons
-            name={item.isFavorite ? 'heart' : 'heart-outline'}
+            name="heart"
             size={24}
-            color={item.isFavorite ? '#FF6B6B' : '#FFFFFF'}
+            color="#FF6B6B"
           />
         </TouchableOpacity>
       </LinearGradient>
@@ -109,7 +80,7 @@ export default function RecipesScreen() {
         <View style={styles.recipeDetailsContainer}>
           <View style={styles.recipeDetail}>
             <Ionicons name="time-outline" size={16} color="#9E9E9E" />
-            <Text style={styles.recipeDetailText}>{item.cookTime} min</Text>
+            <Text style={styles.recipeDetailText}>{item.prepTime} min</Text>
           </View>
           <View style={styles.recipeDetail}>
             <Ionicons name="people-outline" size={16} color="#9E9E9E" />
@@ -120,30 +91,11 @@ export default function RecipesScreen() {
     </TouchableOpacity>
   );
 
-  const renderCategoryFilter = ({ item }: { item: string }) => (
-    <TouchableOpacity
-      style={[
-        styles.categoryButton,
-        selectedCategory === item && styles.selectedCategoryButton,
-      ]}
-      onPress={() => setSelectedCategory(item)}
-    >
-      <Text
-        style={[
-          styles.categoryButtonText,
-          selectedCategory === item && styles.selectedCategoryButtonText,
-        ]}
-      >
-        {item}
-      </Text>
-    </TouchableOpacity>
-  );
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#FF6B6B" />
-        <Text style={styles.loadingText}>Loading recipes...</Text>
+        <Text style={styles.loadingText}>Loading favorites...</Text>
       </View>
     );
   }
@@ -154,12 +106,12 @@ export default function RecipesScreen() {
         colors={['#FF6B6B', '#4ECDC4']}
         style={styles.header}
       >
-        <Text style={styles.headerTitle}>My Recipes</Text>
+        <Text style={styles.headerTitle}>My Favorites</Text>
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color="#9E9E9E" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search recipes..."
+            placeholder="Search favorites..."
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholderTextColor="#9E9E9E"
@@ -169,27 +121,20 @@ export default function RecipesScreen() {
 
       <View style={styles.content}>
         <FlatList
-          data={categories}
-          renderItem={renderCategoryFilter}
-          keyExtractor={(item) => item}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoryList}
-          contentContainerStyle={styles.categoryListContent}
-        />
-
-        <FlatList
-          data={filteredRecipes}
-          renderItem={renderRecipeCard}
+          data={filteredFavorites}
+          renderItem={renderFavoriteCard}
           keyExtractor={(item) => item.id!.toString()}
-          numColumns={2}
-          columnWrapperStyle={styles.recipeRow}
-          contentContainerStyle={styles.recipeList}
+          contentContainerStyle={styles.favoritesList}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No recipes found</Text>
-              <Text style={styles.emptySubtext}>Try searching for something else</Text>
+              <Ionicons name="heart-outline" size={80} color="#E0E0E0" />
+              <Text style={styles.emptyText}>No favorites yet</Text>
+              <Text style={styles.emptySubtext}>
+                {searchQuery.trim() 
+                  ? 'No favorites match your search' 
+                  : 'Start adding recipes to your favorites by tapping the heart icon'}
+              </Text>
             </View>
           }
         />
@@ -246,85 +191,54 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
-  categoryList: {
-    marginVertical: 20,
-  },
-  categoryListContent: {
-    paddingRight: 20,
-  },
-  categoryButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    marginRight: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  selectedCategoryButton: {
-    backgroundColor: '#FF6B6B',
-    borderColor: '#FF6B6B',
-  },
-  categoryButtonText: {
-    fontSize: 14,
-    color: '#9E9E9E',
-    fontWeight: '500',
-  },
-  selectedCategoryButtonText: {
-    color: '#FFFFFF',
-  },
-  recipeList: {
+  favoritesList: {
+    paddingTop: 20,
     paddingBottom: 100,
   },
-  recipeRow: {
-    justifyContent: 'space-between',
-  },
-  recipeCard: {
-    width: (width - 50) / 2,
+  favoriteCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
-    marginBottom: 20,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+    overflow: 'hidden',
   },
   recipeImageContainer: {
-    height: 120,
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    height: 150,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
   },
   recipeEmoji: {
-    fontSize: 40,
+    fontSize: 50,
   },
   favoriteButton: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    top: 15,
+    right: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 20,
-    padding: 5,
+    padding: 8,
   },
   recipeInfo: {
-    padding: 15,
+    padding: 20,
   },
   recipeTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   recipeMetaContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   recipeMeta: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#FF6B6B',
     fontWeight: '500',
   },
@@ -337,24 +251,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   recipeDetailText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#9E9E9E',
-    marginLeft: 4,
+    marginLeft: 6,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 50,
+    paddingTop: 100,
+    paddingHorizontal: 40,
   },
   emptyText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#9E9E9E',
-    marginBottom: 8,
+    marginTop: 20,
+    marginBottom: 10,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#9E9E9E',
+    fontSize: 16,
+    color: '#BDBDBD',
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });
