@@ -1,5 +1,6 @@
 import { useDatabaseContext } from '@/database/DatabaseContext';
 import { Recipe } from '@/database/database';
+import { useSettings } from '@/contexts/SettingsContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -19,6 +20,7 @@ const { width } = Dimensions.get('window');
 
 export default function FavoritesScreen() {
   const { favoriteRecipes, loading, toggleFavorite } = useDatabaseContext();
+  const { darkTheme } = useSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredFavorites, setFilteredFavorites] = useState<Recipe[]>([]);
 
@@ -49,18 +51,18 @@ export default function FavoritesScreen() {
 
   const renderFavoriteCard = ({ item }: { item: Recipe }) => (
     <TouchableOpacity
-      style={styles.favoriteCard}
+      style={getStyles(darkTheme).favoriteCard}
       onPress={() => router.push(`/recipe/${item.id}`)}
     >
       <LinearGradient
         colors={['#FF8A80', '#81C784']}
-        style={styles.recipeImageContainer}
+        style={getStyles(darkTheme).recipeImageContainer}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.recipeEmoji}>{getRecipeImage(item.category)}</Text>
+        <Text style={getStyles(darkTheme).recipeEmoji}>{getRecipeImage(item.category)}</Text>
         <TouchableOpacity
-          style={styles.favoriteButton}
+          style={getStyles(darkTheme).favoriteButton}
           onPress={() => handleToggleFavorite(item.id!)}
         >
           <Ionicons
@@ -71,20 +73,20 @@ export default function FavoritesScreen() {
         </TouchableOpacity>
       </LinearGradient>
       
-      <View style={styles.recipeInfo}>
-        <Text style={styles.recipeTitle}>{item.title}</Text>
-        <View style={styles.recipeMetaContainer}>
-          <Text style={styles.recipeMeta}>{item.category}</Text>
-          <Text style={styles.recipeMeta}>{item.difficulty}</Text>
+      <View style={getStyles(darkTheme).recipeInfo}>
+        <Text style={getStyles(darkTheme).recipeTitle}>{item.title}</Text>
+        <View style={getStyles(darkTheme).recipeMetaContainer}>
+          <Text style={getStyles(darkTheme).recipeMeta}>{item.category}</Text>
+          <Text style={getStyles(darkTheme).recipeMeta}>{item.difficulty}</Text>
         </View>
-        <View style={styles.recipeDetailsContainer}>
-          <View style={styles.recipeDetail}>
+        <View style={getStyles(darkTheme).recipeDetailsContainer}>
+          <View style={getStyles(darkTheme).recipeDetail}>
             <Ionicons name="time-outline" size={16} color="#9E9E9E" />
-            <Text style={styles.recipeDetailText}>{item.prepTime} min</Text>
+            <Text style={getStyles(darkTheme).recipeDetailText}>{item.prepTime} min</Text>
           </View>
-          <View style={styles.recipeDetail}>
+          <View style={getStyles(darkTheme).recipeDetail}>
             <Ionicons name="people-outline" size={16} color="#9E9E9E" />
-            <Text style={styles.recipeDetailText}>{item.servings} servings</Text>
+            <Text style={getStyles(darkTheme).recipeDetailText}>{item.servings} servings</Text>
           </View>
         </View>
       </View>
@@ -93,24 +95,24 @@ export default function FavoritesScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={getStyles(darkTheme).loadingContainer}>
         <ActivityIndicator size="large" color="#FF6B6B" />
-        <Text style={styles.loadingText}>Loading favorites...</Text>
+        <Text style={getStyles(darkTheme).loadingText}>Loading favorites...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={getStyles(darkTheme).container}>
       <LinearGradient
         colors={['#FF6B6B', '#4ECDC4']}
-        style={styles.header}
+        style={getStyles(darkTheme).header}
       >
-        <Text style={styles.headerTitle}>My Favorites</Text>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#9E9E9E" style={styles.searchIcon} />
+        <Text style={getStyles(darkTheme).headerTitle}>My Favorites</Text>
+        <View style={getStyles(darkTheme).searchContainer}>
+          <Ionicons name="search" size={20} color="#9E9E9E" style={getStyles(darkTheme).searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={getStyles(darkTheme).searchInput}
             placeholder="Search favorites..."
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -119,18 +121,18 @@ export default function FavoritesScreen() {
         </View>
       </LinearGradient>
 
-      <View style={styles.content}>
+      <View style={getStyles(darkTheme).content}>
         <FlatList
           data={filteredFavorites}
           renderItem={renderFavoriteCard}
           keyExtractor={(item) => item.id!.toString()}
-          contentContainerStyle={styles.favoritesList}
+          contentContainerStyle={getStyles(darkTheme).favoritesList}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
+            <View style={getStyles(darkTheme).emptyContainer}>
               <Ionicons name="heart-outline" size={80} color="#E0E0E0" />
-              <Text style={styles.emptyText}>No favorites yet</Text>
-              <Text style={styles.emptySubtext}>
+              <Text style={getStyles(darkTheme).emptyText}>No favorites yet</Text>
+              <Text style={getStyles(darkTheme).emptySubtext}>
                 {searchQuery.trim() 
                   ? 'No favorites match your search' 
                   : 'Start adding recipes to your favorites by tapping the heart icon'}
@@ -142,6 +144,139 @@ export default function FavoritesScreen() {
     </View>
   );
 }
+
+const getStyles = (isDark: boolean) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: isDark ? '#121212' : '#F5F5F5',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: isDark ? '#121212' : '#F5F5F5',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: isDark ? '#FFFFFF' : '#9E9E9E',
+  },
+  header: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: isDark ? '#FFFFFF' : '#333',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  favoritesList: {
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
+  favoriteCard: {
+    backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF',
+    borderRadius: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    overflow: 'hidden',
+  },
+  recipeImageContainer: {
+    height: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  recipeEmoji: {
+    fontSize: 50,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  recipeInfo: {
+    padding: 20,
+  },
+  recipeTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: isDark ? '#FFFFFF' : '#333',
+    marginBottom: 10,
+  },
+  recipeMetaContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  recipeMeta: {
+    fontSize: 14,
+    color: '#FF6B6B',
+    fontWeight: '500',
+  },
+  recipeDetailsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  recipeDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  recipeDetailText: {
+    fontSize: 14,
+    color: isDark ? '#CCCCCC' : '#9E9E9E',
+    marginLeft: 6,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 100,
+    paddingHorizontal: 40,
+  },
+  emptyText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: isDark ? '#CCCCCC' : '#9E9E9E',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  emptySubtext: {
+    fontSize: 16,
+    color: isDark ? '#999999' : '#BDBDBD',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+});
 
 const styles = StyleSheet.create({
   container: {

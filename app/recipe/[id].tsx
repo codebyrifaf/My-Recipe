@@ -1,5 +1,6 @@
-import { useDatabaseContext } from '@/database/DatabaseContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import { Recipe } from '@/database/database';
+import { useDatabaseContext } from '@/database/DatabaseContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -17,10 +18,12 @@ import {
 export default function RecipeDetailsScreen() {
   const { id } = useLocalSearchParams();
   const { getRecipeById, toggleFavorite, deleteRecipe } = useDatabaseContext();
+  const { scaleIngredients, defaultServings } = useSettings();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [ingredients, setIngredients] = useState<any[]>([]);
   const [steps, setSteps] = useState<any[]>([]);
+  const [currentServings, setCurrentServings] = useState(defaultServings);
 
   useEffect(() => {
     loadRecipe();
@@ -32,6 +35,7 @@ export default function RecipeDetailsScreen() {
       const recipeData = await getRecipeById(Number(id));
       if (recipeData) {
         setRecipe(recipeData);
+        setCurrentServings(recipeData.servings);
         setIngredients(JSON.parse(recipeData.ingredients || '[]'));
         setSteps(JSON.parse(recipeData.steps || '[]'));
       } else {
@@ -60,6 +64,25 @@ export default function RecipeDetailsScreen() {
       return ingredient;
     });
     setIngredients(updated);
+  };
+
+  const handleServingChange = (newServings: number) => {
+    if (!recipe) return;
+    
+    setCurrentServings(newServings);
+    const originalIngredients = JSON.parse(recipe.ingredients || '[]');
+    const scaledIngredients = scaleIngredients(originalIngredients, recipe.servings, newServings);
+    setIngredients(scaledIngredients);
+  };
+
+  const incrementServings = () => {
+    handleServingChange(currentServings + 1);
+  };
+
+  const decrementServings = () => {
+    if (currentServings > 1) {
+      handleServingChange(currentServings - 1);
+    }
   };
 
   const handleStartCooking = () => {
@@ -141,6 +164,22 @@ export default function RecipeDetailsScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ingredients</Text>
+          <View style={styles.servingAdjuster}>
+            <Text style={styles.servingLabel}>Servings:</Text>
+            <View style={styles.servingControls}>
+              <TouchableOpacity 
+                style={styles.servingButton} 
+                onPress={decrementServings}
+                disabled={currentServings <= 1}
+              >
+                <Ionicons name="remove" size={20} color={currentServings <= 1 ? "#CCC" : "#FF6B6B"} />
+              </TouchableOpacity>
+              <Text style={styles.servingCount}>{currentServings}</Text>
+              <TouchableOpacity style={styles.servingButton} onPress={incrementServings}>
+                <Ionicons name="add" size={20} color="#FF6B6B" />
+              </TouchableOpacity>
+            </View>
+          </View>
           {ingredients.map((ingredient, index) => (
             <TouchableOpacity
               key={index}
@@ -389,5 +428,47 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 100,
+  },
+  servingAdjuster: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginBottom: 15,
+  },
+  servingLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  servingControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  servingButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  servingCount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginHorizontal: 20,
+    minWidth: 30,
+    textAlign: 'center',
   },
 });

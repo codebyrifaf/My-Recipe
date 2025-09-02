@@ -1,9 +1,10 @@
+import { useSettings } from '@/contexts/SettingsContext';
 import { useDatabaseContext } from '@/database/DatabaseContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     KeyboardAvoidingView,
@@ -18,6 +19,7 @@ import {
 
 export default function AddRecipeScreen() {
   const { addRecipe } = useDatabaseContext();
+  const { defaultServings } = useSettings();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Breakfast');
   const [difficulty, setDifficulty] = useState('Easy');
@@ -27,6 +29,11 @@ export default function AddRecipeScreen() {
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState([{ name: '', amount: '', isChecked: false }]);
   const [steps, setSteps] = useState([{ stepNumber: 1, instruction: '', duration: null }]);
+
+  // Set default servings when component mounts
+  useEffect(() => {
+    setServings(defaultServings.toString());
+  }, [defaultServings]);
 
   const categories = ['Breakfast', 'Lunch', 'Dinner', 'Dessert'];
   const difficulties = ['Easy', 'Medium', 'Hard'];
