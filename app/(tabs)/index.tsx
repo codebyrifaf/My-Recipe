@@ -9,6 +9,7 @@ import {
   Alert,
   Dimensions,
   FlatList,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -128,14 +129,19 @@ export default function RecipesScreen() {
       ]}
       onPress={() => setSelectedCategory(item)}
     >
-      <Text
-        style={[
-          styles.categoryButtonText,
-          selectedCategory === item && styles.selectedCategoryButtonText,
-        ]}
-      >
-        {item}
-      </Text>
+      <View style={styles.categoryTextContainer}>
+        <Text
+          style={[
+            styles.categoryButtonText,
+            selectedCategory === item && styles.selectedCategoryButtonText,
+          ]}
+          numberOfLines={1}
+          adjustsFontSizeToFit={false}
+          allowFontScaling={false}
+        >
+          {item}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 
@@ -248,28 +254,34 @@ const styles = StyleSheet.create({
   },
   categoryList: {
     marginVertical: 20,
-    maxHeight: 50,
+    maxHeight: 60,
   },
   categoryListContent: {
     paddingHorizontal: 20,
     alignItems: 'center',
   },
   categoryButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     marginRight: 12,
     backgroundColor: '#FFFFFF',
-    borderRadius: 25,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    minWidth: 80,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 2,
+    minWidth: 80,
+    maxWidth: 120,
+    
+  },
+  categoryTextContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   selectedCategoryButton: {
     backgroundColor: '#FF6B6B',
@@ -285,6 +297,16 @@ const styles = StyleSheet.create({
     color: '#9E9E9E',
     fontWeight: '600',
     textAlign: 'center',
+    ...Platform.select({
+      android: {
+        includeFontPadding: false,
+        textAlignVertical: 'center',
+        fontFamily: 'System',
+      },
+      ios: {
+        fontFamily: 'System',
+      },
+    }),
   },
   selectedCategoryButtonText: {
     color: '#FFFFFF',
