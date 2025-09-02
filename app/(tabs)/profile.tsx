@@ -1,8 +1,8 @@
 import { useSettings } from '@/contexts/SettingsContext';
 import { useDatabaseContext } from '@/database/DatabaseContext';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as FileSystem from 'expo-file-system';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import React, { useState } from 'react';

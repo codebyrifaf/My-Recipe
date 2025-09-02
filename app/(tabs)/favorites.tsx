@@ -1,6 +1,6 @@
+import { useSettings } from '@/contexts/SettingsContext';
 import { useDatabaseContext } from '@/database/DatabaseContext';
 import { Recipe } from '@/database/database';
-import { useSettings } from '@/contexts/SettingsContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
