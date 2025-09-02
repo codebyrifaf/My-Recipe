@@ -156,9 +156,17 @@ export default function AddRecipeScreen() {
                 selectedValue={category}
                 onValueChange={setCategory}
                 style={styles.picker}
+                mode="dropdown"
+                dropdownIconColor="#9E9E9E"
               >
                 {categories.map((cat) => (
-                  <Picker.Item key={cat} label={cat} value={cat} />
+                  <Picker.Item 
+                    key={cat} 
+                    label={cat} 
+                    value={cat}
+                    color="#333"
+                    style={styles.pickerItem}
+                  />
                 ))}
               </Picker>
             </View>
@@ -171,9 +179,17 @@ export default function AddRecipeScreen() {
                 selectedValue={difficulty}
                 onValueChange={setDifficulty}
                 style={styles.picker}
+                mode="dropdown"
+                dropdownIconColor="#9E9E9E"
               >
                 {difficulties.map((diff) => (
-                  <Picker.Item key={diff} label={diff} value={diff} />
+                  <Picker.Item 
+                    key={diff} 
+                    label={diff} 
+                    value={diff}
+                    color="#333"
+                    style={styles.pickerItem}
+                  />
                 ))}
               </Picker>
             </View>
@@ -368,11 +384,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    overflow: 'hidden',
+    height: 50,
+    justifyContent: 'center',
+    paddingHorizontal: 5,
   },
   picker: {
-    height: 45,
+    height: 50,
     color: '#333',
+    fontSize: 16,
+    width: '100%',
+  },
+  pickerItem: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
   },
   ingredientRow: {
     flexDirection: 'row',
