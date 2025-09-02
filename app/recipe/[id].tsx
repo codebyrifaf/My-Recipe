@@ -18,7 +18,7 @@ import {
 export default function RecipeDetailsScreen() {
   const { id } = useLocalSearchParams();
   const { getRecipeById, toggleFavorite, deleteRecipe } = useDatabaseContext();
-  const { scaleIngredients, defaultServings } = useSettings();
+  const { scaleIngredients, defaultServings, darkTheme } = useSettings();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [ingredients, setIngredients] = useState<any[]>([]);
@@ -105,23 +105,23 @@ export default function RecipeDetailsScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer, { backgroundColor: darkTheme ? '#1a1a1a' : '#F5F5F5' }]}>
         <ActivityIndicator size="large" color="#FF6B6B" />
-        <Text style={styles.loadingText}>Loading recipe...</Text>
+        <Text style={[styles.loadingText, { color: darkTheme ? '#CCCCCC' : '#9E9E9E' }]}>Loading recipe...</Text>
       </View>
     );
   }
 
   if (!recipe) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Recipe not found</Text>
+      <View style={[styles.errorContainer, { backgroundColor: darkTheme ? '#1a1a1a' : '#F5F5F5' }]}>
+        <Text style={[styles.errorText, { color: darkTheme ? '#CCCCCC' : '#9E9E9E' }]}>Recipe not found</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, { backgroundColor: darkTheme ? '#1a1a1a' : '#F5F5F5' }]} showsVerticalScrollIndicator={false}>
       <LinearGradient
         colors={['#FF6B6B', '#4ECDC4']}
         style={styles.header}
@@ -149,7 +149,7 @@ export default function RecipeDetailsScreen() {
 
       <View style={styles.content}>
         <View style={styles.recipeHeader}>
-          <Text style={styles.recipeTitle}>{recipe.title}</Text>
+          <Text style={[styles.recipeTitle, { color: darkTheme ? '#FFFFFF' : '#333' }]}>{recipe.title}</Text>
           <View style={styles.recipeMetaContainer}>
             <Text style={styles.recipeMeta}>{recipe.category}</Text>
             <Text style={styles.recipeMeta}>{recipe.difficulty} • {recipe.cookTime} min • {recipe.servings} servings</Text>
@@ -158,24 +158,24 @@ export default function RecipeDetailsScreen() {
 
         {recipe.description && (
           <View style={styles.section}>
-            <Text style={styles.recipeDescription}>{recipe.description}</Text>
+            <Text style={[styles.recipeDescription, { color: darkTheme ? '#CCCCCC' : '#666' }]}>{recipe.description}</Text>
           </View>
         )}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ingredients</Text>
-          <View style={styles.servingAdjuster}>
-            <Text style={styles.servingLabel}>Servings:</Text>
+          <Text style={[styles.sectionTitle, { color: darkTheme ? '#FFFFFF' : '#333' }]}>Ingredients</Text>
+          <View style={[styles.servingAdjuster, { backgroundColor: darkTheme ? '#2a2a2a' : '#F8F9FA' }]}>
+            <Text style={[styles.servingLabel, { color: darkTheme ? '#FFFFFF' : '#333' }]}>Servings:</Text>
             <View style={styles.servingControls}>
               <TouchableOpacity 
-                style={styles.servingButton} 
+                style={[styles.servingButton, { backgroundColor: darkTheme ? '#3a3a3a' : '#FFFFFF', borderColor: darkTheme ? '#555' : '#E0E0E0' }]} 
                 onPress={decrementServings}
                 disabled={currentServings <= 1}
               >
                 <Ionicons name="remove" size={20} color={currentServings <= 1 ? "#CCC" : "#FF6B6B"} />
               </TouchableOpacity>
-              <Text style={styles.servingCount}>{currentServings}</Text>
-              <TouchableOpacity style={styles.servingButton} onPress={incrementServings}>
+              <Text style={[styles.servingCount, { color: darkTheme ? '#FFFFFF' : '#333' }]}>{currentServings}</Text>
+              <TouchableOpacity style={[styles.servingButton, { backgroundColor: darkTheme ? '#3a3a3a' : '#FFFFFF', borderColor: darkTheme ? '#555' : '#E0E0E0' }]} onPress={incrementServings}>
                 <Ionicons name="add" size={20} color="#FF6B6B" />
               </TouchableOpacity>
             </View>
@@ -183,7 +183,7 @@ export default function RecipeDetailsScreen() {
           {ingredients.map((ingredient, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.ingredientItem}
+              style={[styles.ingredientItem, { borderBottomColor: darkTheme ? '#3a3a3a' : '#F0F0F0' }]}
               onPress={() => handleToggleIngredient(index)}
             >
               <View style={[
@@ -196,6 +196,7 @@ export default function RecipeDetailsScreen() {
               </View>
               <Text style={[
                 styles.ingredientText,
+                { color: darkTheme ? '#FFFFFF' : '#333' },
                 ingredient.isChecked && styles.checkedText
               ]}>
                 {ingredient.amount} {ingredient.name}
@@ -205,13 +206,13 @@ export default function RecipeDetailsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Instructions</Text>
+          <Text style={[styles.sectionTitle, { color: darkTheme ? '#FFFFFF' : '#333' }]}>Instructions</Text>
           {steps.map((step, index) => (
             <View key={index} style={styles.stepItem}>
               <View style={styles.stepNumber}>
                 <Text style={styles.stepNumberText}>{step.stepNumber}</Text>
               </View>
-              <Text style={styles.stepText}>{step.instruction}</Text>
+              <Text style={[styles.stepText, { color: darkTheme ? '#CCCCCC' : '#333' }]}>{step.instruction}</Text>
             </View>
           ))}
         </View>
@@ -226,8 +227,8 @@ export default function RecipeDetailsScreen() {
             </LinearGradient>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.editButton} onPress={handleEditRecipe}>
-            <Text style={styles.editButtonText}>Edit Recipe</Text>
+          <TouchableOpacity style={[styles.editButton, { backgroundColor: darkTheme ? '#3a3a3a' : '#FFFFFF', borderColor: darkTheme ? '#555' : '#E0E0E0' }]} onPress={handleEditRecipe}>
+            <Text style={[styles.editButtonText, { color: darkTheme ? '#FFFFFF' : '#333' }]}>Edit Recipe</Text>
           </TouchableOpacity>
         </View>
 
@@ -240,28 +241,23 @@ export default function RecipeDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#9E9E9E',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
   },
   errorText: {
     fontSize: 18,
-    color: '#9E9E9E',
   },
   header: {
     paddingTop: 50,
@@ -317,7 +313,6 @@ const styles = StyleSheet.create({
   recipeTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 10,
   },
   recipeMetaContainer: {
@@ -333,13 +328,11 @@ const styles = StyleSheet.create({
   },
   recipeDescription: {
     fontSize: 16,
-    color: '#666',
     lineHeight: 24,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 15,
   },
   ingredientItem: {
@@ -347,7 +340,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
   },
   checkbox: {
     width: 24,
@@ -364,7 +356,6 @@ const styles = StyleSheet.create({
   },
   ingredientText: {
     fontSize: 16,
-    color: '#333',
     flex: 1,
   },
   checkedText: {
@@ -392,7 +383,6 @@ const styles = StyleSheet.create({
   },
   stepText: {
     fontSize: 16,
-    color: '#333',
     flex: 1,
     lineHeight: 24,
   },
@@ -414,15 +404,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   editButton: {
-    backgroundColor: '#FFFFFF',
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#E0E0E0',
   },
   editButtonText: {
-    color: '#333',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -433,7 +420,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderRadius: 12,
@@ -442,7 +428,6 @@ const styles = StyleSheet.create({
   servingLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
   },
   servingControls: {
     flexDirection: 'row',
@@ -452,11 +437,9 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -466,7 +449,6 @@ const styles = StyleSheet.create({
   servingCount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     marginHorizontal: 20,
     minWidth: 30,
     textAlign: 'center',
