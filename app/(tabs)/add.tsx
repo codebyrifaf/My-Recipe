@@ -19,7 +19,7 @@ import {
 
 export default function AddRecipeScreen() {
   const { addRecipe } = useDatabaseContext();
-  const { defaultServings } = useSettings();
+  const { defaultServings, darkTheme } = useSettings();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Breakfast');
   const [difficulty, setDifficulty] = useState('Easy');
@@ -133,21 +133,21 @@ export default function AddRecipeScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={getStyles(darkTheme).container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <LinearGradient
         colors={['#4ECDC4', '#44A08D']}
-        style={styles.header}
+        style={getStyles(darkTheme).header}
       >
-        <Text style={styles.headerTitle}>Add Recipe</Text>
+        <Text style={getStyles(darkTheme).headerTitle}>Add Recipe</Text>
       </LinearGradient>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>RECIPE TITLE</Text>
+      <ScrollView style={getStyles(darkTheme).content} showsVerticalScrollIndicator={false}>
+        <View style={getStyles(darkTheme).section}>
+          <Text style={getStyles(darkTheme).sectionTitle}>RECIPE TITLE</Text>
           <TextInput
-            style={styles.input}
+            style={getStyles(darkTheme).input}
             placeholder="Enter recipe name"
             value={title}
             onChangeText={setTitle}
@@ -155,20 +155,20 @@ export default function AddRecipeScreen() {
           />
         </View>
 
-        <View style={styles.row}>
-          <View style={styles.halfWidth}>
-            <Text style={styles.sectionTitle}>CATEGORY</Text>
-            <View style={styles.pickerContainer}>
+        <View style={getStyles(darkTheme).row}>
+          <View style={getStyles(darkTheme).halfWidth}>
+            <Text style={getStyles(darkTheme).sectionTitle}>CATEGORY</Text>
+            <View style={getStyles(darkTheme).pickerContainer}>
               <Picker
                 selectedValue={category}
                 onValueChange={setCategory}
-                style={styles.picker}
+                style={getStyles(darkTheme).picker}
                 mode="dropdown"
                 dropdownIconColor="#9E9E9E"
                 itemStyle={{
                   fontSize: 16,
                   height: 50,
-                  color: '#333',
+                  color: darkTheme ? '#FFFFFF' : '#333',
                   textAlign: 'center',
                 }}
               >
@@ -177,27 +177,27 @@ export default function AddRecipeScreen() {
                     key={cat} 
                     label={cat} 
                     value={cat}
-                    color="#333"
-                    style={styles.pickerItem}
+                    color={darkTheme ? '#FFFFFF' : '#333'}
+                    style={getStyles(darkTheme).pickerItem}
                   />
                 ))}
               </Picker>
             </View>
           </View>
 
-          <View style={styles.halfWidth}>
-            <Text style={styles.sectionTitle}>DIFFICULTY</Text>
-            <View style={styles.pickerContainer}>
+          <View style={getStyles(darkTheme).halfWidth}>
+            <Text style={getStyles(darkTheme).sectionTitle}>DIFFICULTY</Text>
+            <View style={getStyles(darkTheme).pickerContainer}>
               <Picker
                 selectedValue={difficulty}
                 onValueChange={setDifficulty}
-                style={styles.picker}
+                style={getStyles(darkTheme).picker}
                 mode="dropdown"
                 dropdownIconColor="#9E9E9E"
                 itemStyle={{
                   fontSize: 16,
                   height: 50,
-                  color: '#333',
+                  color: darkTheme ? '#FFFFFF' : '#333',
                   textAlign: 'center',
                 }}
               >
@@ -206,8 +206,8 @@ export default function AddRecipeScreen() {
                     key={diff} 
                     label={diff} 
                     value={diff}
-                    color="#333"
-                    style={styles.pickerItem}
+                    color={darkTheme ? '#FFFFFF' : '#333'}
+                    style={getStyles(darkTheme).pickerItem}
                   />
                 ))}
               </Picker>
@@ -215,11 +215,11 @@ export default function AddRecipeScreen() {
           </View>
         </View>
 
-        <View style={styles.row}>
-          <View style={styles.halfWidth}>
-            <Text style={styles.sectionTitle}>PREP TIME</Text>
+        <View style={getStyles(darkTheme).row}>
+          <View style={getStyles(darkTheme).halfWidth}>
+            <Text style={getStyles(darkTheme).sectionTitle}>PREP TIME</Text>
             <TextInput
-              style={styles.input}
+              style={getStyles(darkTheme).input}
               placeholder="Minutes"
               value={prepTime}
               onChangeText={setPrepTime}
@@ -228,10 +228,10 @@ export default function AddRecipeScreen() {
             />
           </View>
 
-          <View style={styles.halfWidth}>
-            <Text style={styles.sectionTitle}>COOK TIME</Text>
+          <View style={getStyles(darkTheme).halfWidth}>
+            <Text style={getStyles(darkTheme).sectionTitle}>COOK TIME</Text>
             <TextInput
-              style={styles.input}
+              style={getStyles(darkTheme).input}
               placeholder="Minutes"
               value={cookTime}
               onChangeText={setCookTime}
@@ -241,10 +241,10 @@ export default function AddRecipeScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>SERVINGS</Text>
+        <View style={getStyles(darkTheme).section}>
+          <Text style={getStyles(darkTheme).sectionTitle}>SERVINGS</Text>
           <TextInput
-            style={styles.input}
+            style={getStyles(darkTheme).input}
             placeholder="Number of servings"
             value={servings}
             onChangeText={setServings}
@@ -253,10 +253,10 @@ export default function AddRecipeScreen() {
           />
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>DESCRIPTION</Text>
+        <View style={getStyles(darkTheme).section}>
+          <Text style={getStyles(darkTheme).sectionTitle}>DESCRIPTION</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[getStyles(darkTheme).input, getStyles(darkTheme).textArea]}
             placeholder="Brief description..."
             value={description}
             onChangeText={setDescription}
@@ -266,31 +266,31 @@ export default function AddRecipeScreen() {
           />
         </View>
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>INGREDIENTS</Text>
-            <TouchableOpacity onPress={addIngredient} style={styles.addButton}>
+        <View style={getStyles(darkTheme).section}>
+          <View style={getStyles(darkTheme).sectionHeader}>
+            <Text style={getStyles(darkTheme).sectionTitle}>INGREDIENTS</Text>
+            <TouchableOpacity onPress={addIngredient} style={getStyles(darkTheme).addButton}>
               <Ionicons name="add" size={20} color="#4ECDC4" />
             </TouchableOpacity>
           </View>
           {ingredients.map((ingredient, index) => (
-            <View key={index} style={styles.ingredientRow}>
+            <View key={index} style={getStyles(darkTheme).ingredientRow}>
               <TextInput
-                style={[styles.input, styles.ingredientInput]}
+                style={[getStyles(darkTheme).input, getStyles(darkTheme).ingredientInput]}
                 placeholder="Ingredient name"
                 value={ingredient.name}
                 onChangeText={(value) => updateIngredient(index, 'name', value)}
                 placeholderTextColor="#9E9E9E"
               />
               <TextInput
-                style={[styles.input, styles.amountInput]}
+                style={[getStyles(darkTheme).input, getStyles(darkTheme).amountInput]}
                 placeholder="Amount"
                 value={ingredient.amount}
                 onChangeText={(value) => updateIngredient(index, 'amount', value)}
                 placeholderTextColor="#9E9E9E"
               />
               {ingredients.length > 1 && (
-                <TouchableOpacity onPress={() => removeIngredient(index)} style={styles.removeButton}>
+                <TouchableOpacity onPress={() => removeIngredient(index)} style={getStyles(darkTheme).removeButton}>
                   <Ionicons name="trash" size={20} color="#FF6B6B" />
                 </TouchableOpacity>
               )}
@@ -298,18 +298,18 @@ export default function AddRecipeScreen() {
           ))}
         </View>
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>COOKING STEPS</Text>
-            <TouchableOpacity onPress={addStep} style={styles.addButton}>
+        <View style={getStyles(darkTheme).section}>
+          <View style={getStyles(darkTheme).sectionHeader}>
+            <Text style={getStyles(darkTheme).sectionTitle}>COOKING STEPS</Text>
+            <TouchableOpacity onPress={addStep} style={getStyles(darkTheme).addButton}>
               <Ionicons name="add" size={20} color="#4ECDC4" />
             </TouchableOpacity>
           </View>
           {steps.map((step, index) => (
-            <View key={index} style={styles.stepRow}>
-              <Text style={styles.stepNumber}>{step.stepNumber}</Text>
+            <View key={index} style={getStyles(darkTheme).stepRow}>
+              <Text style={getStyles(darkTheme).stepNumber}>{step.stepNumber}</Text>
               <TextInput
-                style={[styles.input, styles.stepInput]}
+                style={[getStyles(darkTheme).input, getStyles(darkTheme).stepInput]}
                 placeholder="Cooking instruction..."
                 value={step.instruction}
                 onChangeText={(value) => updateStep(index, value)}
@@ -317,7 +317,7 @@ export default function AddRecipeScreen() {
                 placeholderTextColor="#9E9E9E"
               />
               {steps.length > 1 && (
-                <TouchableOpacity onPress={() => removeStep(index)} style={styles.removeButton}>
+                <TouchableOpacity onPress={() => removeStep(index)} style={getStyles(darkTheme).removeButton}>
                   <Ionicons name="trash" size={20} color="#FF6B6B" />
                 </TouchableOpacity>
               )}
@@ -325,20 +325,161 @@ export default function AddRecipeScreen() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <TouchableOpacity style={getStyles(darkTheme).submitButton} onPress={handleSubmit}>
           <LinearGradient
             colors={['#FF6B6B', '#FF8E8E']}
-            style={styles.submitGradient}
+            style={getStyles(darkTheme).submitGradient}
           >
-            <Text style={styles.submitText}>Add Recipe</Text>
+            <Text style={getStyles(darkTheme).submitText}>Add Recipe</Text>
           </LinearGradient>
         </TouchableOpacity>
 
-        <View style={styles.bottomSpacing} />
+        <View style={getStyles(darkTheme).bottomSpacing} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+
+const getStyles = (isDark: boolean) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: isDark ? '#121212' : '#F5F5F5',
+  },
+  header: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  section: {
+    marginTop: 20,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: isDark ? '#CCCCCC' : '#9E9E9E',
+    marginBottom: 8,
+    letterSpacing: 1,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: isDark ? '#FFFFFF' : '#333',
+    borderWidth: 1,
+    borderColor: isDark ? '#333' : '#E0E0E0',
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  halfWidth: {
+    width: '48%',
+  },
+  pickerContainer: {
+    backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: isDark ? '#333' : '#E0E0E0',
+    height: 55,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 0,
+  },
+  picker: {
+    height: 55,
+    color: isDark ? '#FFFFFF' : '#333',
+    fontSize: 16,
+    width: '100%',
+    backgroundColor: 'transparent',
+  },
+  pickerItem: {
+    fontSize: 16,
+    color: isDark ? '#FFFFFF' : '#333',
+    fontWeight: '500',
+    height: 50,
+  },
+  ingredientRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  ingredientInput: {
+    flex: 2,
+    marginRight: 10,
+  },
+  amountInput: {
+    flex: 1,
+    marginRight: 10,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 15,
+  },
+  stepNumber: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#4ECDC4',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    lineHeight: 30,
+    fontWeight: 'bold',
+    marginRight: 10,
+    marginTop: 6,
+  },
+  stepInput: {
+    flex: 1,
+    marginRight: 10,
+    minHeight: 45,
+  },
+  addButton: {
+    padding: 5,
+  },
+  removeButton: {
+    padding: 5,
+  },
+  submitButton: {
+    marginTop: 30,
+    borderRadius: 25,
+    overflow: 'hidden',
+  },
+  submitGradient: {
+    paddingVertical: 15,
+    alignItems: 'center',
+  },
+  submitText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  bottomSpacing: {
+    height: 100,
+  },
+});
 
 const styles = StyleSheet.create({
   container: {

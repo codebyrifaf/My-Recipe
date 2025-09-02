@@ -1,5 +1,6 @@
 import { useDatabaseContext } from '@/database/DatabaseContext';
 import { Recipe } from '@/database/database';
+import { useSettings } from '@/contexts/SettingsContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -21,6 +22,7 @@ const { width } = Dimensions.get('window');
 
 export default function RecipesScreen() {
   const { recipes, loading, toggleFavorite, deleteRecipe, searchRecipes } = useDatabaseContext();
+  const { darkTheme } = useSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -79,18 +81,18 @@ export default function RecipesScreen() {
 
   const renderRecipeCard = ({ item }: { item: Recipe }) => (
     <TouchableOpacity
-      style={styles.recipeCard}
+      style={getStyles(darkTheme).recipeCard}
       onPress={() => router.push(`/recipe/${item.id}`)}
     >
       <LinearGradient
         colors={['#FF8A80', '#81C784']}
-        style={styles.recipeImageContainer}
+        style={getStyles(darkTheme).recipeImageContainer}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Text style={styles.recipeEmoji}>{getRecipeImage(item.category)}</Text>
+        <Text style={getStyles(darkTheme).recipeEmoji}>{getRecipeImage(item.category)}</Text>
         <TouchableOpacity
-          style={styles.favoriteButton}
+          style={getStyles(darkTheme).favoriteButton}
           onPress={() => handleToggleFavorite(item.id!)}
         >
           <Ionicons
@@ -101,20 +103,20 @@ export default function RecipesScreen() {
         </TouchableOpacity>
       </LinearGradient>
       
-      <View style={styles.recipeInfo}>
-        <Text style={styles.recipeTitle}>{item.title}</Text>
-        <View style={styles.recipeMetaContainer}>
-          <Text style={styles.recipeMeta}>{item.category}</Text>
-          <Text style={styles.recipeMeta}>{item.difficulty}</Text>
+      <View style={getStyles(darkTheme).recipeInfo}>
+        <Text style={getStyles(darkTheme).recipeTitle}>{item.title}</Text>
+        <View style={getStyles(darkTheme).recipeMetaContainer}>
+          <Text style={getStyles(darkTheme).recipeMeta}>{item.category}</Text>
+          <Text style={getStyles(darkTheme).recipeMeta}>{item.difficulty}</Text>
         </View>
-        <View style={styles.recipeDetailsContainer}>
-          <View style={styles.recipeDetail}>
+        <View style={getStyles(darkTheme).recipeDetailsContainer}>
+          <View style={getStyles(darkTheme).recipeDetail}>
             <Ionicons name="time-outline" size={16} color="#9E9E9E" />
-            <Text style={styles.recipeDetailText}>{item.cookTime} min</Text>
+            <Text style={getStyles(darkTheme).recipeDetailText}>{item.cookTime} min</Text>
           </View>
-          <View style={styles.recipeDetail}>
+          <View style={getStyles(darkTheme).recipeDetail}>
             <Ionicons name="people-outline" size={16} color="#9E9E9E" />
-            <Text style={styles.recipeDetailText}>{item.servings} servings</Text>
+            <Text style={getStyles(darkTheme).recipeDetailText}>{item.servings} servings</Text>
           </View>
         </View>
       </View>
@@ -124,16 +126,16 @@ export default function RecipesScreen() {
   const renderCategoryFilter = ({ item }: { item: string }) => (
     <TouchableOpacity
       style={[
-        styles.categoryButton,
-        selectedCategory === item && styles.selectedCategoryButton,
+        getStyles(darkTheme).categoryButton,
+        selectedCategory === item && getStyles(darkTheme).selectedCategoryButton,
       ]}
       onPress={() => setSelectedCategory(item)}
     >
-      <View style={styles.categoryTextContainer}>
+      <View style={getStyles(darkTheme).categoryTextContainer}>
         <Text
           style={[
-            styles.categoryButtonText,
-            selectedCategory === item && styles.selectedCategoryButtonText,
+            getStyles(darkTheme).categoryButtonText,
+            selectedCategory === item && getStyles(darkTheme).selectedCategoryButtonText,
           ]}
           numberOfLines={1}
           adjustsFontSizeToFit={false}
@@ -147,24 +149,24 @@ export default function RecipesScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={getStyles(darkTheme).loadingContainer}>
         <ActivityIndicator size="large" color="#FF6B6B" />
-        <Text style={styles.loadingText}>Loading recipes...</Text>
+        <Text style={getStyles(darkTheme).loadingText}>Loading recipes...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={getStyles(darkTheme).container}>
       <LinearGradient
         colors={['#FF6B6B', '#4ECDC4']}
-        style={styles.header}
+        style={getStyles(darkTheme).header}
       >
-        <Text style={styles.headerTitle}>My Recipes</Text>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#9E9E9E" style={styles.searchIcon} />
+        <Text style={getStyles(darkTheme).headerTitle}>My Recipes</Text>
+        <View style={getStyles(darkTheme).searchContainer}>
+          <Ionicons name="search" size={20} color="#9E9E9E" style={getStyles(darkTheme).searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={getStyles(darkTheme).searchInput}
             placeholder="Search recipes..."
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -173,15 +175,15 @@ export default function RecipesScreen() {
         </View>
       </LinearGradient>
 
-      <View style={styles.content}>
+      <View style={getStyles(darkTheme).content}>
         <FlatList
           data={categories}
           renderItem={renderCategoryFilter}
           keyExtractor={(item) => item}
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.categoryList}
-          contentContainerStyle={styles.categoryListContent}
+          style={getStyles(darkTheme).categoryList}
+          contentContainerStyle={getStyles(darkTheme).categoryListContent}
         />
 
         <FlatList
@@ -189,13 +191,13 @@ export default function RecipesScreen() {
           renderItem={renderRecipeCard}
           keyExtractor={(item) => item.id!.toString()}
           numColumns={2}
-          columnWrapperStyle={styles.recipeRow}
-          contentContainerStyle={styles.recipeList}
+          columnWrapperStyle={getStyles(darkTheme).recipeRow}
+          contentContainerStyle={getStyles(darkTheme).recipeList}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No recipes found</Text>
-              <Text style={styles.emptySubtext}>Try searching for something else</Text>
+            <View style={getStyles(darkTheme).emptyContainer}>
+              <Text style={getStyles(darkTheme).emptyText}>No recipes found</Text>
+              <Text style={getStyles(darkTheme).emptySubtext}>Try searching for something else</Text>
             </View>
           }
         />
@@ -203,6 +205,200 @@ export default function RecipesScreen() {
     </View>
   );
 }
+
+const getStyles = (isDark: boolean) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: isDark ? '#121212' : '#F5F5F5',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: isDark ? '#121212' : '#F5F5F5',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: isDark ? '#FFFFFF' : '#9E9E9E',
+  },
+  header: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: isDark ? '#FFFFFF' : '#333',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 0,
+  },
+  categoryList: {
+    marginVertical: 20,
+    maxHeight: 60,
+  },
+  categoryListContent: {
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  categoryButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    marginRight: 12,
+    backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: isDark ? '#333' : '#E0E0E0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    minWidth: 80,
+    maxWidth: 120,
+  },
+  categoryTextContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  selectedCategoryButton: {
+    backgroundColor: '#FF6B6B',
+    borderColor: '#FF6B6B',
+    shadowColor: '#FF6B6B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  categoryButtonText: {
+    fontSize: 14,
+    color: isDark ? '#CCCCCC' : '#9E9E9E',
+    fontWeight: '600',
+    textAlign: 'center',
+    ...Platform.select({
+      android: {
+        includeFontPadding: false,
+        textAlignVertical: 'center',
+        fontFamily: 'System',
+      },
+      ios: {
+        fontFamily: 'System',
+      },
+    }),
+  },
+  selectedCategoryButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  recipeList: {
+    paddingBottom: 100,
+    paddingHorizontal: 20,
+  },
+  recipeRow: {
+    justifyContent: 'space-between',
+  },
+  recipeCard: {
+    width: (width - 50) / 2,
+    backgroundColor: isDark ? '#1F1F1F' : '#FFFFFF',
+    borderRadius: 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  recipeImageContainer: {
+    height: 120,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  recipeEmoji: {
+    fontSize: 40,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 20,
+    padding: 5,
+  },
+  recipeInfo: {
+    padding: 15,
+  },
+  recipeTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: isDark ? '#FFFFFF' : '#333',
+    marginBottom: 8,
+  },
+  recipeMetaContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  recipeMeta: {
+    fontSize: 12,
+    color: '#FF6B6B',
+    fontWeight: '500',
+  },
+  recipeDetailsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  recipeDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  recipeDetailText: {
+    fontSize: 12,
+    color: isDark ? '#CCCCCC' : '#9E9E9E',
+    marginLeft: 4,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 50,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: isDark ? '#CCCCCC' : '#9E9E9E',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: isDark ? '#999999' : '#9E9E9E',
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
