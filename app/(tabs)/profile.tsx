@@ -2,6 +2,9 @@ import { useSettings } from '@/contexts/SettingsContext';
 import { useDatabaseContext } from '@/database/DatabaseContext';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as FileSystem from 'expo-file-system';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import React, { useState } from 'react';
 import {
     Alert,
@@ -60,12 +63,253 @@ export default function ProfileScreen() {
     setShowMeasurementsModal(false);
   };
 
-  const handleExportRecipes = () => {
-    Alert.alert('Export Recipes', 'Export functionality would be implemented here.');
+  const handleExportRecipes = async () => {
+    try {
+      console.log('=== PDF Export Function Called ===');
+      if (recipes.length === 0) {
+        Alert.alert('No Recipes', 'You have no recipes to export.');
+        return;
+      }
+
+      console.log('Generating PDF for', recipes.length, 'recipes');
+
+      // Generate HTML content for the PDF
+      const generateRecipeHTML = () => {
+        const currentDate = new Date().toLocaleDateString();
+        
+        const recipesHTML = recipes.map(recipe => {
+          // Parse ingredients and steps
+          let ingredients = [];
+          let steps = [];
+          
+          try {
+            ingredients = JSON.parse(recipe.ingredients || '[]');
+            steps = JSON.parse(recipe.steps || '[]');
+          } catch (e) {
+            ingredients = [];
+            steps = [];
+          }
+
+          const ingredientsHTML = ingredients.map((ing: any) => 
+            `<li>${ing.amount} ${ing.name}</li>`
+          ).join('');
+
+          const stepsHTML = steps.map((step: any, index: number) => 
+            `<li><strong>Step ${index + 1}:</strong> ${step.instruction}</li>`
+          ).join('');
+
+          return `
+            <div class="recipe">
+              <h2>${recipe.title}</h2>
+              <div class="recipe-meta">
+                <span><strong>Category:</strong> ${recipe.category}</span> | 
+                <span><strong>Difficulty:</strong> ${recipe.difficulty}</span> | 
+                <span><strong>Prep Time:</strong> ${recipe.prepTime} min</span> | 
+                <span><strong>Cook Time:</strong> ${recipe.cookTime} min</span> | 
+                <span><strong>Servings:</strong> ${recipe.servings}</span>
+              </div>
+              
+              ${recipe.description ? `<p class="description"><strong>Description:</strong> ${recipe.description}</p>` : ''}
+              
+              <h3>Ingredients</h3>
+              <ul class="ingredients">
+                ${ingredientsHTML}
+              </ul>
+              
+              <h3>Instructions</h3>
+              <ol class="instructions">
+                ${stepsHTML}
+              </ol>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>My Recipe Collection</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                margin: 40px;
+                line-height: 1.6;
+                color: #333;
+              }
+              
+              .header {
+                text-align: center;
+                border-bottom: 3px solid #FF6B6B;
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+              }
+              
+              .header h1 {
+                color: #FF6B6B;
+                font-size: 2.5em;
+                margin: 0;
+              }
+              
+              .header p {
+                color: #666;
+                font-size: 1.1em;
+                margin: 10px 0;
+              }
+              
+              .recipe {
+                page-break-inside: avoid;
+                margin-bottom: 40px;
+                border: 1px solid #e0e0e0;
+                border-radius: 10px;
+                padding: 20px;
+                background-color: #fafafa;
+              }
+              
+              .recipe h2 {
+                color: #FF6B6B;
+                border-bottom: 2px solid #FF6B6B;
+                padding-bottom: 10px;
+                margin-top: 0;
+              }
+              
+              .recipe-meta {
+                background-color: #f0f8ff;
+                padding: 10px;
+                border-radius: 5px;
+                margin: 15px 0;
+                font-size: 0.9em;
+              }
+              
+              .description {
+                font-style: italic;
+                background-color: #fff;
+                padding: 10px;
+                border-left: 4px solid #4ECDC4;
+                margin: 15px 0;
+              }
+              
+              h3 {
+                color: #4ECDC4;
+                margin-top: 25px;
+                margin-bottom: 10px;
+              }
+              
+              .ingredients {
+                background-color: #fff;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 10px 0;
+              }
+              
+              .instructions {
+                background-color: #fff;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 10px 0;
+              }
+              
+              li {
+                margin: 8px 0;
+              }
+              
+              .footer {
+                text-align: center;
+                margin-top: 40px;
+                padding-top: 20px;
+                border-top: 1px solid #e0e0e0;
+                color: #666;
+                font-size: 0.9em;
+              }
+              
+              @media print {
+                body { margin: 20px; }
+                .recipe { page-break-inside: avoid; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>🍽️ My Recipe Collection</h1>
+              <p>Exported on ${currentDate}</p>
+              <p>Total Recipes: ${recipes.length}</p>
+            </div>
+            
+            ${recipesHTML}
+            
+            <div class="footer">
+              <p>Generated by My Recipe App • ${currentDate}</p>
+            </div>
+          </body>
+          </html>
+        `;
+      };
+
+      // Generate PDF
+      const html = generateRecipeHTML();
+      const { uri } = await Print.printToFileAsync({
+        html,
+        base64: false,
+      });
+
+      // Create a better filename with timestamp
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const fileName = `my-recipes-${timestamp}.pdf`;
+      
+      // Move the file to a more accessible location
+      const newUri = FileSystem.documentDirectory + fileName;
+      await FileSystem.moveAsync({
+        from: uri,
+        to: newUri,
+      });
+
+      // Share the PDF file
+      const isAvailable = await Sharing.isAvailableAsync();
+      
+      if (isAvailable) {
+        await Sharing.shareAsync(newUri, {
+          mimeType: 'application/pdf',
+          dialogTitle: 'Export My Recipes',
+          UTI: 'com.adobe.pdf'
+        });
+        
+        Alert.alert(
+          'PDF Export Successful!', 
+          `Successfully exported ${recipes.length} recipes to PDF! You can now save or share the file.`
+        );
+      } else {
+        Alert.alert(
+          'PDF Export Complete',
+          `Recipes exported to PDF: ${fileName}\nFile saved to device storage.`
+        );
+      }
+      
+    } catch (error) {
+      console.error('PDF Export error:', error);
+      Alert.alert('Export Failed', 'Failed to export recipes to PDF. Please try again.');
+    }
   };
 
   const handleImportRecipes = () => {
-    Alert.alert('Import Recipes', 'Import functionality would be implemented here.');
+    Alert.alert(
+      'Import Recipes',
+      'To import recipes:\n\n1. Currently, import is not available\n2. Export creates PDF files for sharing and viewing\n3. Contact the app developer for import features',
+      [
+        { text: 'OK', style: 'default' },
+        { 
+          text: 'View Export Format', 
+          onPress: () => showExportFormat()
+        }
+      ]
+    );
+  };
+
+  const showExportFormat = () => {
+    Alert.alert(
+      'Export File Format',
+      'The app exports recipes in PDF format with the following features:\n\n• Professional document layout\n• Complete recipe details including ingredients and steps\n• Print-friendly formatting\n• Easy sharing and viewing on any device\n• Timestamped filenames for organization\n\nPDF files preserve all your recipe data in a beautiful, readable format.',
+      [{ text: 'Got it', style: 'default' }]
+    );
   };
 
   const handleClearAllData = () => {
