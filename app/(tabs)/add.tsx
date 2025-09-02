@@ -158,6 +158,12 @@ export default function AddRecipeScreen() {
                 style={styles.picker}
                 mode="dropdown"
                 dropdownIconColor="#9E9E9E"
+                itemStyle={{
+                  fontSize: 16,
+                  height: 50,
+                  color: '#333',
+                  textAlign: 'center',
+                }}
               >
                 {categories.map((cat) => (
                   <Picker.Item 
@@ -181,6 +187,12 @@ export default function AddRecipeScreen() {
                 style={styles.picker}
                 mode="dropdown"
                 dropdownIconColor="#9E9E9E"
+                itemStyle={{
+                  fontSize: 16,
+                  height: 50,
+                  color: '#333',
+                  textAlign: 'center',
+                }}
               >
                 {difficulties.map((diff) => (
                   <Picker.Item 
@@ -384,20 +396,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    height: 50,
+    height: 55,
     justifyContent: 'center',
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 0,
   },
   picker: {
-    height: 50,
+    height: 55,
     color: '#333',
     fontSize: 16,
     width: '100%',
+    backgroundColor: 'transparent',
   },
   pickerItem: {
     fontSize: 16,
     color: '#333',
     fontWeight: '500',
+    height: 50,
   },
   ingredientRow: {
     flexDirection: 'row',
